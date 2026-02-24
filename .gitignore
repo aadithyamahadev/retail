@@ -8,9 +8,13 @@ pnpm-debug.log*
 lerna-debug.log*
 
 node_modules
+.next
 dist
 dist-ssr
 *.local
+.cloudflared.log
+.localtunnel.log
+.localtunnel-meaningful.log
 
 # Editor directories and files
 .vscode/*
