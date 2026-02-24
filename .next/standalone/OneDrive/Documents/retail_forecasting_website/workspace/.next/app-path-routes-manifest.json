@@ -1,0 +1,11 @@
+{
+  "/api/analytics/route": "/api/analytics",
+  "/api/billing-mode/route": "/api/billing-mode",
+  "/api/forecast/route": "/api/forecast",
+  "/_not-found/page": "/_not-found",
+  "/api/insights/route": "/api/insights",
+  "/api/photo-mode/route": "/api/photo-mode",
+  "/api/upload-sales-image/route": "/api/upload-sales-image",
+  "/api/upload-sales/route": "/api/upload-sales",
+  "/page": "/"
+}
