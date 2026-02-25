@@ -3,14 +3,15 @@ const ALLOWED_CSV_MIME_TYPES = new Set(['text/csv', 'application/vnd.ms-excel'])
 export function assertSameOrigin(request: Request) {
   const origin = request.headers.get('origin')
   const host = request.headers.get('x-forwarded-host') ?? request.headers.get('host')
-  const proto = request.headers.get('x-forwarded-proto') ?? 'https'
 
   if (!origin || !host) {
-    throw new Error('Request origin could not be verified.')
+    // Allow requests without origin header (e.g. server-side, curl)
+    return
   }
 
-  const expectedOrigin = `${proto}://${host}`
-  if (origin !== expectedOrigin) {
+  // Compare just the hostname, ignoring protocol differences from proxies
+  const originHost = new URL(origin).host
+  if (originHost !== host) {
     throw new Error('Cross-origin requests are not allowed.')
   }
 }
