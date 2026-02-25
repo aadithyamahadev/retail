@@ -25,17 +25,22 @@ function getRateLimit(pathname: string) {
   return 100
 }
 
-function applySecurityHeaders(response: NextResponse) {
+function applySecurityHeaders(response: NextResponse, isApiRoute: boolean) {
   response.headers.set('X-Frame-Options', 'DENY')
   response.headers.set('X-Content-Type-Options', 'nosniff')
   response.headers.set('Referrer-Policy', 'strict-origin-when-cross-origin')
   response.headers.set('Permissions-Policy', 'camera=(), microphone=(), geolocation=()')
-  response.headers.set('Cross-Origin-Resource-Policy', 'same-origin')
-  response.headers.set('Cross-Origin-Opener-Policy', 'same-origin')
+  
+  // Only apply strict CORP/COOP on API routes - these can break Vercel's CDN for page assets
+  if (isApiRoute) {
+    response.headers.set('Cross-Origin-Resource-Policy', 'same-origin')
+    response.headers.set('Cross-Origin-Opener-Policy', 'same-origin')
+  }
+  
   response.headers.set('Strict-Transport-Security', 'max-age=31536000; includeSubDomains; preload')
   response.headers.set(
     'Content-Security-Policy',
-    "default-src 'self'; img-src 'self' data: blob:; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; font-src 'self' data:; connect-src 'self'; frame-ancestors 'none'; base-uri 'self'; form-action 'self'",
+    "default-src 'self'; img-src 'self' data: blob: https:; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; font-src 'self' data:; connect-src 'self'; frame-ancestors 'none'; base-uri 'self'; form-action 'self'",
   )
 }
 
@@ -61,16 +66,18 @@ function isRateLimited(request: NextRequest) {
 }
 
 export function middleware(request: NextRequest) {
-  if (request.nextUrl.pathname.startsWith('/api/')) {
+  const isApiRoute = request.nextUrl.pathname.startsWith('/api/')
+  
+  if (isApiRoute) {
     if (isRateLimited(request)) {
       const response = NextResponse.json({ success: false, error: 'Too many requests.' }, { status: 429 })
-      applySecurityHeaders(response)
+      applySecurityHeaders(response, true)
       return response
     }
   }
 
   const response = NextResponse.next()
-  applySecurityHeaders(response)
+  applySecurityHeaders(response, isApiRoute)
   return response
 }
 
