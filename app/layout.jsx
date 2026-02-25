@@ -1,4 +1,5 @@
 import './globals.css'
+import ErrorBoundary from '../components/ErrorBoundary'
 
 export const metadata = {
   title: 'Retail Forecasting Starter',
@@ -11,7 +12,9 @@ export const metadata = {
 export default function RootLayout({ children }) {
   return (
     <html lang="en">
-      <body>{children}</body>
+      <body>
+        <ErrorBoundary>{children}</ErrorBoundary>
+      </body>
     </html>
   )
 }
